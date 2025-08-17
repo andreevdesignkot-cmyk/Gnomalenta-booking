@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gnomalenta — Reserva Taller</title>
+  <style>
+    :root{--bg:#f6f6f7;--card:#fff;--ink:#151515;--muted:#6b7280;--brand:#10b981;--border:#e5e7eb}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue","Noto Sans","Apple Color Emoji","Segoe UI Emoji";}
+    .wrap{max-width:960px;margin:0 auto;padding:20px}
+    header{position:sticky;top:0;background:rgba(255,255,255,.8);backdrop-filter:blur(6px);border-bottom:1px solid var(--border);}
+    header .inner{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;max-width:960px;margin:0 auto;}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo-badge{width:40px;height:40px;border-radius:14px;background:var(--brand);display:grid;place-items:center;color:#fff;font-weight:800}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px}
+    .grid{display:grid;gap:16px}
+    @media(min-width:860px){.grid{grid-template-columns:2fr 1fr}}
+    .pill{padding:8px 12px;border:1px solid var(--border);border-radius:12px;background:#fff;cursor:pointer}
+    .pill.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+    .btn{padding:10px 16px;border-radius:12px;border:0;background:var(--brand);color:#fff;font-weight:600;cursor:pointer}
+    .row{display:grid;gap:8px}
+    input,select,textarea{padding:10px 12px;border:1px solid var(--border);border-radius:12px;width:100%}
+    small{color:var(--muted)}
+    .slots{display:flex;flex-wrap:wrap;gap:8px}
+    .slot{padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;cursor:pointer}
+    .slot.sel{background:#111;color:#fff;border-color:#111}
+    .slot.off{opacity:.4;pointer-events:none}
+    .k{display:inline-block;padding:2px 8px;border-radius:8px;background:#eef2ff;color:#3730a3;font-size:12px}
+    footer{color:var(--muted);font-size:12px;padding:24px 20px;max-width:960px;margin:0 auto}
+    .right *{font-size:14px}
+    .muted{color:var(--muted)}
+    .lang button{padding:6px 10px;border:1px solid var(--border);border-radius:10px;background:#fff;cursor:pointer}
+    .lang .on{background:#111;color:#fff}
+    .admin{padding:6px 10px;border:1px solid var(--border);border-radius:10px;background:#fff;cursor:pointer}
+    .list{max-height:360px;overflow:auto;border-top:1px dashed var(--border);margin-top:12px;padding-top:12px}
+    .tag{display:inline-block;padding:2px 6px;border-radius:8px;background:#f3f4f6;color:#374151;font-size:12px}
+    .warn{background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12;padding:10px 12px;border-radius:12px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="inner">
+      <div class="logo">
+        <div class="logo-badge">G</div>
+        <div>
+          <div style="font-weight:700">Gnomalenta — <span data-t="title_ru" style="display:none">Запись на мастер‑класс</span><span data-t="title_es">Reserva a taller</span></div>
+          <div class="muted" style="font-size:12px">Natahoyo / La Calzada, Gijón</div>
+        </div>
+      </div>
+      <div class="lang">
+        <button id="btn-es" class="on">ES</button>
+        <button id="btn-ru">RU</button>
+        <button id="btn-admin" class="admin" title="Admin">Admin</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap grid">
+    <section class="card">
+      <h2 style="margin:0 0 4px 0" data-t="h_ru" hidden>Забронировать место</h2>
+      <h2 style="margin:0 0 4px 0" data-t="h_es">Reservar plaza</h2>
+      <small data-t="p_ru" hidden>Выберите дату, время и укажите контакты.</small>
+      <small data-t="p_es">Elige fecha, hora y tus datos de contacto.</small>
+
+      <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:12px">
+        <!-- Dates -->
+        <div>
+          <div style="font-size:14px;font-weight:600" data-t="date_ru" hidden>Дата</div>
+          <div style="font-size:14px;font-weight:600" data-t="date_es">Fecha</div>
+          <div id="dates" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px"></div>
+        </div>
+
+        <!-- Times -->
+        <div>
+          <div style="font-size:14px;font-weight:600" data-t="time_ru" hidden>Время</div>
+          <div style="font-size:14px;font-weight:600" data-t="time_es">Hora</div>
+          <div id="times" class="slots" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <form id="form" class="grid" style="grid-template-columns:1fr 1fr;margin-top:12px">
+        <div class="row" style="grid-column:1/-1">
+          <label><span data-t="name_ru" hidden>Имя и фамилия</span><span data-t="name_es">Nombre y apellidos</span></label>
+          <input id="name" required placeholder="Sasha Ivanova">
+        </div>
+        <div class="row">
+          <label>WhatsApp</label>
+          <input id="phone" placeholder="+34 …">
+        </div>
+        <div class="row">
+          <label>Email</label>
+          <input id="email" type="email" placeholder="you@example.com">
+        </div>
+        <div class="row">
+          <label><span data-t="people_ru" hidden>Количество человек</span><span data-t="people_es">Nº de personas</span></label>
+          <input id="people" type="number" min="1" max="6" value="1">
+        </div>
+        <div class="row" style="grid-column:1/-1">
+          <label><span data-t="comment_ru" hidden>Комментарий (необязательно)</span><span data-t="comment_es">Comentario (opcional)</span></label>
+          <input id="notes" placeholder="Edad del niño/a, deseos…">
+        </div>
+        <div style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px">
+          <button class="btn" type="submit"><span data-t="btn_ru" hidden>Забронировать</span><span data-t="btn_es">Reservar</span></button>
+          <a id="wa" href="https://wa.me/34600000000?text=Hola%20Gnomalenta,%20quiero%20reservar%20un%20taller" target="_blank" class="muted">WhatsApp</a>
+        </div>
+      </form>
+      <div id="warn" class="warn" style="display:none;margin-top:10px"></div>
+    </section>
+
+    <aside class="card right">
+      <div style="font-weight:600;margin-bottom:8px"><span data-t="next_ru" hidden>Ближайшие сеансы</span><span data-t="next_es">Próximas sesiones</span></div>
+      <div id="summary" class="grid" style="gap:8px"></div>
+
+      <div class="list" id="adminList" style="display:none"></div>
+    </aside>
+  </div>
+
+  <footer>
+    © <span id="year"></span> Gnomalenta · <span class="muted"><span data-t="hint_ru" hidden>Нажмите Admin для списка броней</span><span data-t="hint_es">Pulsa Admin para ver reservas</span></span>
+  </footer>
+
+<script>
+(function(){
+  const LS = { bookings: 'gnoma_bookings_v1', slots: 'gnoma_slots_v1', lang: 'gnoma_lang_v1' };
+  const PASSWORD = 'gnomalenta'; // cambia esto
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const yearEl = $('#year'); yearEl.textContent = new Date().getFullYear();
+
+  // Lang
+  let lang = localStorage.getItem(LS.lang) || 'es';
+  function setLang(l){
+    lang = l; localStorage.setItem(LS.lang, l);
+    const showEs = l==='es';
+    $$('[data-t$=\"_es\"]').forEach(e=>e.hidden=!showEs);
+    $$('[data-t$=\"_ru\"]').forEach(e=>e.hidden=showEs);
+    $('#btn-es').classList.toggle('on', showEs);
+    $('#btn-ru').classList.toggle('on', !showEs);
+    render();
+  }
+  $('#btn-es').onclick=()=>setLang('es');
+  $('#btn-ru').onclick=()=>setLang('ru');
+  setLang(lang);
+
+  // Data
+  let bookings = JSON.parse(localStorage.getItem(LS.bookings) || '[]');
+  let slots = JSON.parse(localStorage.getItem(LS.slots) || 'null');
+  if(!slots){ // default: next 14 days, closed Monday, 11:00 & 17:30, capacity 6
+    const base = new Date(); base.setHours(0,0,0,0);
+    slots = [];
+    for(let i=0;i<14;i++){
+      const d = new Date(base); d.setDate(d.getDate()+i);
+      if(d.getDay()===1) continue;
+      const iso = d.toISOString().slice(0,10);
+      slots.push({ date: iso, times: [{time:'11:00', cap:6},{time:'17:30', cap:6}] });
+    }
+    localStorage.setItem(LS.slots, JSON.stringify(slots));
+  }
+
+  // State
+  let selectedDate = slots[0]?.date || '';
+  let selectedTime = '';
+
+  function capLeft(date,time){
+    const day = slots.find(s=>s.date===date);
+    const total = day?.times.find(t=>t.time===time)?.cap || 0;
+    const used = bookings.filter(b=>b.date===date && b.time===time).reduce((s,b)=>s+(+b.people||1),0);
+    return Math.max(total - used, 0);
+  }
+
+  function fmtDate(d){
+    try{
+      return new Date(d+'T00:00:00').toLocaleDateString(lang==='es'?'es-ES':'ru-RU',{weekday:'short',day:'2-digit',month:'short'});
+    }catch{ return d }
+  }
+
+  function renderDates(){
+    const box = $('#dates'); box.innerHTML='';
+    slots.forEach(s=>{
+      const b = document.createElement('button');
+      b.className = 'pill' + (s.date===selectedDate?' active':'');
+      b.textContent = fmtDate(s.date);
+      b.title = s.date;
+      b.onclick=()=>{selectedDate=s.date; selectedTime=''; renderTimes();};
+      box.appendChild(b);
+    });
+  }
+
+  function renderTimes(){
+    const box = $('#times'); box.innerHTML='';
+    const day = slots.find(s=>s.date===selectedDate);
+    if(!day){ box.innerHTML = '<small class="muted">—</small>'; return; }
+    day.times.forEach(t=>{
+      const left = capLeft(selectedDate, t.time);
+      const btn = document.createElement('button');
+      btn.className = 'slot' + (left===0?' off':'') + (selectedTime===t.time?' sel':'');
+      btn.innerHTML = `<strong>${t.time}</strong> <span class="tag" style="margin-left:6px">${left}</span>`;
+      btn.onclick=()=>{ if(left>0){ selectedTime=t.time; renderTimes(); }};
+      box.appendChild(btn);
+    });
+  }
+
+  function renderSummary(){
+    const box = $('#summary'); box.innerHTML='';
+    slots.forEach(s=>{
+      const wrap = document.createElement('div');
+      wrap.className='card'; wrap.style.padding='12px';
+      wrap.innerHTML = `<div style="font-size:13px;font-weight:600;margin-bottom:6px">${fmtDate(s.date)} <span class="muted">(${s.date})</span></div>`;
+      const line = document.createElement('div'); line.style.display='flex'; line.style.flexWrap='wrap'; line.style.gap='8px';
+      s.times.forEach(t=>{
+        const left = capLeft(s.date, t.time);
+        const tag = document.createElement('div'); tag.className='k'; tag.textContent = `${t.time} · ${left}`;
+        line.appendChild(tag);
+      });
+      wrap.appendChild(line);
+      box.appendChild(wrap);
+    });
+  }
+
+  function renderAdmin(){
+    const box = $('#adminList');
+    box.innerHTML='';
+    if(!box.style.display || box.style.display==='none') return;
+    if(bookings.length===0){ box.innerHTML = '<div class="muted">No hay reservas / Пока пусто</div>'; return; }
+    const groups = {};
+    bookings.forEach(b=>{
+      const k = `${b.date} ${b.time}`;
+      (groups[k] ||= []).push(b);
+    });
+    Object.keys(groups).sort().forEach(k=>{
+      const arr = groups[k];
+      const div = document.createElement('div'); div.className='card'; div.style.marginBottom='8px';
+      const total = arr.reduce((s,b)=>s+(+b.people||1),0);
+      div.innerHTML = `<div style="font-weight:600">${k} · total: ${total}</div>`;
+      arr.forEach(b=>{
+        const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.fontSize='14px'; row.style.marginTop='6px';
+        row.innerHTML = `<div><strong>${b.name}</strong> · ${b.people} · <span class="muted">${b.phone||''} ${b.email?('· '+b.email):''}</span>${b.notes?('<div class="muted" style="font-size:12px">'+b.notes+'</div>'):''}</div>`;
+        const del = document.createElement('button'); del.textContent='✕'; del.className='pill'; del.onclick=()=>{ bookings = bookings.filter(x=>x.id!==b.id); localStorage.setItem(LS.bookings, JSON.stringify(bookings)); render(); };
+        row.appendChild(del);
+        div.appendChild(row);
+      });
+      box.appendChild(div);
+    });
+  }
+
+  function render(){
+    renderDates(); renderTimes(); renderSummary(); renderAdmin();
+  }
+
+  render();
+
+  // Form submit
+  $('#form').addEventListener('submit', function(e){
+    e.preventDefault();
+    const warn = $('#warn'); warn.style.display='none'; warn.textContent='';
+    if(!selectedDate || !selectedTime){
+      warn.textContent = (lang==='es'?'Selecciona fecha y hora':'Выберите дату и время');
+      warn.style.display='block'; return;
+    }
+    const name = $('#name').value.trim();
+    const phone = $('#phone').value.trim();
+    const email = $('#email').value.trim();
+    const people = Math.max(1, Math.min(6, +($('#people').value||1)));
+    const notes = $('#notes').value.trim();
+
+    const left = capLeft(selectedDate, selectedTime);
+    if(people > left){
+      warn.textContent = (lang==='es'?'Quedan plazas: ':'Осталось мест: ') + left;
+      warn.style.display='block'; return;
+    }
+
+    const b = { id: crypto.randomUUID(), createdAt: new Date().toISOString(),
+      date: selectedDate, time: selectedTime, name, phone, email, people, notes, source: 'web' };
+    bookings.push(b);
+    localStorage.setItem(LS.bookings, JSON.stringify(bookings));
+    alert(lang==='es'?'¡Listo! Reserva guardada.':'Готово! Бронь сохранена.');
+    $('#form').reset(); render();
+  });
+
+  // Admin
+  $('#btn-admin').onclick = () => {
+    const p = prompt(lang==='es'?'Contraseña admin':'Пароль админа');
+    if(p===PASSWORD){
+      const box = $('#adminList');
+      box.style.display = (box.style.display==='none' || !box.style.display) ? 'block' : 'none';
+      renderAdmin();
+    } else {
+      alert(lang==='es'?'Contraseña incorrecta':'Неверный пароль');
+    }
+  };
+})();
+</script>
+</body>
+</html>
